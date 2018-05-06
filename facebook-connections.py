@@ -171,12 +171,9 @@ class FacebookScraper(object):
 
 
 def exec_worker(username, password, df):
-        print("1")
         scraper = FacebookScraper()
         scraper.fb_login(username, password)
-        print("2")
         scraper.scrape_2nd_degrees(df=df)
-        print("3")
         return df.index
 
 
