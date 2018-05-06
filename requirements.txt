@@ -1,3 +1,4 @@
 selenium
 wget
 piexif
+pandas
