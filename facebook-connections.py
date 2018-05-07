@@ -20,6 +20,7 @@ class FacebookScraper(object):
     # --------------- Ask user to log in -----------------
     def fb_login(self, username, password):
         print("Opening browser...")
+        time.sleep(1)
         self.browser.get("https://www.facebook.com/")
 
         # Log In
@@ -133,6 +134,7 @@ class FacebookScraper(object):
     # --------------- Scrape 2nd degree connections. ---------------
     # This can take several days if you have a lot of friends!!
     def scrape_2nd_degrees(self, filename=None, df=None):
+        time.sleep(1)
         now = datetime.now()
         # Prep CSV Output File
         csv_out = '2nd-degree_%s.csv' % now.strftime("%Y-%m-%d_%H%M%S")
