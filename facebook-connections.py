@@ -195,8 +195,9 @@ class ParallelProcessing(object):
 
         self.filename = filename
         self.df_orig = pd.read_csv(filename, index_col='index')
+        self.df_orig['index'] = self.df_orig.index
         df = self.df_orig[self.df_orig['processed'] == False].copy()
-        df.to_csv(self.to_process_csv)
+        df.to_csv(self.to_process_csv, index=False)
 
         self.workers = workers
         self.pool = mp.Pool(workers)
@@ -207,7 +208,7 @@ class ParallelProcessing(object):
 
         start_time = time.time()
 
-        reader = pd.read_csv(self.to_process_csv, chunksize=chunk_size)
+        reader = pd.read_csv(self.to_process_csv, index_col='index', chunksize=chunk_size)
 
         worker_count = 0
         processes = []
