@@ -195,8 +195,9 @@ class ParallelProcessing(object):
 
         self.filename = filename
         self.df_orig = pd.read_csv(filename, index_col='index')
-        self.df_orig['index'] = self.df_orig.index
-        df = self.df_orig[self.df_orig['processed'] == False].copy()
+        df_temp = self.df_orig.copy()
+        df_temp['index'] = df_temp.index
+        df = df_temp[df_temp['processed'] == False].copy()
         df.to_csv(self.to_process_csv, index=False)
 
         self.workers = workers
