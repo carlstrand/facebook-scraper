@@ -1,4 +1,4 @@
 selenium
 wget
 piexif
-pandas
+pandas==0.22.0

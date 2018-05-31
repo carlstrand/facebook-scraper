@@ -130,6 +130,7 @@ class FacebookScraper(object):
                 writer.writerow([myid,"Me",friend['id'],friend['name'],friend['active']])
 
         print("Successfully saved to %s" % csv_out)
+        self.browser.close()
 
     # --------------- Scrape 2nd degree connections. ---------------
     # This can take several days if you have a lot of friends!!
@@ -171,6 +172,8 @@ class FacebookScraper(object):
             for person in their_friends:
                 writer.writerow([friend['uid'], person['id'], friend['name'], person['name'], person['active']])
 
+        self.browser.close()
+
 
 def exec_worker(username, password, df):
         scraper = FacebookScraper()
@@ -203,7 +206,8 @@ class ParallelProcessing(object):
         df.to_csv(self.to_process_csv, index=False)
 
         self.workers = workers
-        self.pool = mp.Pool(workers)
+        if self.workers > 1:
+            self.pool = mp.Pool(workers)
 
     def run(self, username, password, chunk_size=50):
         total = self.df_orig[self.df_orig['processed']].shape[0]
@@ -213,18 +217,25 @@ class ParallelProcessing(object):
 
         reader = pd.read_csv(self.to_process_csv, index_col='index', chunksize=chunk_size)
 
-        worker_count = 0
-        processes = []
-        for df_chunk in reader:
-            if worker_count == self.workers:
-                break
-            p = self.pool.apply_async(exec_worker, [username, password, df_chunk])
-            processes.append(p)
-            worker_count += 1
+        if self.workers > 1:
+            worker_count = 0
+            processes = []
+            for df_chunk in reader:
+                if worker_count == self.workers:
+                    break
+                p = self.pool.apply_async(exec_worker, [username, password, df_chunk])
+                processes.append(p)
+                worker_count += 1
 
-        for p in processes:
-            idxs = p.get()  # get processed indexes from df
-            self.df_orig.loc[idxs, 'processed'] = True
+            for p in processes:
+                idxs = p.get()  # get processed indexes from df
+                self.df_orig.loc[idxs, 'processed'] = True
+        else:
+            # Run in current thread. This is done to avoid socket permissions exception on certain Windows installations
+            for df_chunk in reader:
+                idxs = exec_worker(username, password, df_chunk)
+                self.df_orig.loc[idxs, 'processed'] = True
+                break
 
         total = self.df_orig[self.df_orig['processed']].shape[0]
         print(f'Total Processed records: {total}')
@@ -259,7 +270,8 @@ if __name__ == "__main__":
         inst.scrape_2nd_degrees(filename=args.seeds)
     else:
         df = pd.read_csv(args.seeds)
-        print(f'Total records to process in parallel: {df.shape[0]}')
+        print(f'Total records to process: {df.shape[0]}')
+        print(f'Records are going to be processed in parallel: {"YES" if args.workers > 1 else "NO"}')
         if 'processed' not in df.columns:
             df['processed'] = False
             df.to_csv(args.seeds, index_label='index')
