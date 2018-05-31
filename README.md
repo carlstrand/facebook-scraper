@@ -27,22 +27,28 @@ Getting your list of friends is no longer possible via the Facebook Graph API, s
 2) Download a list of your 2nd-degree connections for social network analysis. Both modes save data to a CSV in a format friendly for importing into graph databases.
 
 ### 1st degree connections (your friends)
-1. Run ```python facebook-connections.py```
-2. It will open a browser window. Fill out your username & password and log in.
-3. Press Enter in the terminal after logging in.
-4. You should see your Facebook friends page scroll to the bottom.
-5. A CSV file will be created with the data (1st-degree_YYYY-MM-DD_HHMM.csv)
+1. Run ```python facebook-connections.py -u <you_email_address> -p <your_passowrd>```
+2. It will open a browser window, then automatically fil your username & password and log in.
+3. You should see your Facebook friends page scroll to the bottom.
+4. A CSV file will be created with the data (1st-degree_YYYY-MM-DD_HHMM.csv)
 
 ### 2st degree connections (your friends' friends)
 Note: This could take days if you have lots of friends!
 
 1. Get your 1st degree connections first, so you have the 1st-degree CSV file.
 2. Put the 1st-degree CSV in the same folder as **python facebook-connections.py**
-3. Run ```python facebook-connections.py 1st-degree_YYYY-MM-DD_HHMM.csv```, with the actual filename from the first step.
-4. A browser window will open. Fill out your username & password and log in.
-5. Press Enter in the terminal after logging in.
-6. You should the script looping through your Facebook friends' friend pages.
-7. A CSV file will be created with the data (2nd-degree_YYYY-MM-DD_HHMM.csv)
+3. Run ```python facebook-connections.py -u <you_email_address> -p <your_passowrd> --seeds 1st-degree_YYYY-MM-DD_HHMM.csv```, with the actual filename from the first step.
+4. A browser window will open, then automatically fil your username & password and log in.
+5. You should the script looping through your Facebook friends' friend pages.
+6. A CSV file will be created with the data (2nd-degree_YYYY-MM-DD_HHMM.csv)
+
+### 2st degree connections using parallel processing and batch mode:
+**WARNING** You can run as many workers as you want, but be careful. Facebook could temporarily block your account!
+
+In order to extract your 2nd degree FB connections using multiple workers in batch mode, run the following command:
+```sh
+$ python facebook-connections.py -u <you_email_address> -p <your_passowrd> --seeds <1st-degree-file.csv> --workers <no_workers>
+```
 
 **Note**: This currently gets tripped up by the following situations, because the scroll_to_bottom() function doesn't accurately detect when it's at the bottom of the friends list. Please feel free to improve with a pull request!
 - Friends that have their privacy settings to show no friends

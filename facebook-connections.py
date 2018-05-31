@@ -82,7 +82,7 @@ class FacebookScraper(object):
     def load_csv(self, filename):
         inactive = 0
         friends = []
-        with open(filename, 'r') as input_csv:
+        with open(filename, 'r', encoding='utf-8') as input_csv:
             reader = csv.DictReader(input_csv)
             for idx,row in enumerate(reader):
                 if row['active'] is '1':
