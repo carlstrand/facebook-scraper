@@ -7,9 +7,6 @@ import multiprocessing as mp
 import time
 import traceback
 
-os.system('clear')
-
-
 class FacebookScraper(object):
 
     browser: webdriver.Firefox
