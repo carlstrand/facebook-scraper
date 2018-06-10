@@ -30,11 +30,19 @@ class FacebookScraper(object):
 
     # --------------- Scroll to bottom of page -----------------
     def scroll_to_bottom(self):
+
+        just_followers = self.browser \
+            .find_elements_by_xpath(
+                '//div[@id="pagelet_timeline_medley_friends"]//div[@id="pagelet_collections_followers"]')
+
+        if just_followers:
+            return False
+
         public_friends = self.browser \
             .find_elements_by_xpath('//div[@id="pagelet_timeline_medley_friends"]//div[@class="fsl fwb fcb"]/a')
 
         if not public_friends:
-            return False;
+            return False
 
         print("Scrolling to bottom...")
         while True:
